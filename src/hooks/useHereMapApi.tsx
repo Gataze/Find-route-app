@@ -17,6 +17,8 @@ export const useHereMapApi = (data: FetchedData[]) => {
   const refEl = useRef() as React.MutableRefObject<HTMLDivElement>;
 
   useEffect(() => {
+    console.log("Effect here maps");
+
     // Latitudes and longitudes of selected locations received from HERE Geocoding & Search API
     const {
       items: [
@@ -73,21 +75,32 @@ export const useHereMapApi = (data: FetchedData[]) => {
     function onSuccess(result: any) {
       var route = result.routes[0];
       addRouteShapeToMap(route, map);
+
+      console.log(route);
+
       addSummaryToContext(route, data, dispatch);
-      route?.sections.forEach(
-        (section: { travelSummary: { length: string; duration: string } }) => {
-          setCurrentRoute!((prevState: CurrentRoute) =>
-            prevState
-              ? {
-                  ...prevState,
-                  exactStartPlace,
-                  exactStopPlace,
-                  distance: +section.travelSummary.length / 1000,
-                  duration: toMMSS(+section.travelSummary.duration),
-                }
-              : prevState
-          );
-        }
+
+      const summarizedLength = route?.sections.reduce((acc: any, curr: any) => {
+        return acc + curr.travelSummary.length;
+      }, 0);
+
+      const summarizedDuration = route?.sections.reduce(
+        (acc: any, curr: any) => {
+          return acc + curr.travelSummary.duration;
+        },
+        0
+      );
+
+      setCurrentRoute((prevState: CurrentRoute) =>
+        prevState
+          ? {
+              ...prevState,
+              exactStartPlace: exactStartPlace,
+              exactStopPlace: exactStopPlace,
+              distance: summarizedLength / 1000,
+              duration: toMMSS(+summarizedDuration),
+            }
+          : 0
       );
     }
 

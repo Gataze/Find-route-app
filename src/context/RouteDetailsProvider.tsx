@@ -61,6 +61,5 @@ export const RouteDetailsPriovider: React.FC<
       getRoute,
     };
   }, [navigate, routesHistory, dispatch, currentRoute]);
-
   return <MapDetails.Provider value={value} {...props} />;
 };
